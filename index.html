@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MindStream</title>
     <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; margin: 0; color: #fff; padding: 20px 0; font-size: 0.85rem; }
@@ -23,7 +23,6 @@
 
         h1 { margin-bottom: 1.2rem; font-size: 1.5rem; letter-spacing: 2px; }
 
-        /* 入力エリア（少し内側に寄せる） */
         .profile-bar, .input-group, #post-btn {
             width: 92%;
             margin-left: auto;
@@ -32,29 +31,35 @@
 
         .profile-bar { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 50px; }
         .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; background: #ddd; }
-        #user-name-input { width: 80px; padding: 5px; border-radius: 8px; border: none; text-align: center; font-size: 0.8rem; font-weight: bold; }
+        
+        /* 名前入力欄：ズームを防ぐためフォントサイズを16pxに設定 */
+        #user-name-input { width: 80px; padding: 5px; border-radius: 8px; border: none; text-align: center; font-size: 16px; font-weight: bold; }
         .edit-btn, #logout-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; padding: 3px 8px; border-radius: 20px; font-size: 0.65rem; cursor: pointer; }
 
         .input-group { background: rgba(255, 255, 255, 0.9); border-radius: 15px; padding: 10px; text-align: left; box-sizing: border-box; }
-        textarea { width: 100%; height: 50px; background: transparent; border: none; box-sizing: border-box; font-size: 0.85rem; color: #333; outline: none; resize: none; display: block; }
+        
+        /* 投稿入力欄：ここもズームを防ぐため16pxに。見た目が大きすぎる場合は後で微調整可能です */
+        textarea { width: 100%; height: 50px; background: transparent; border: none; box-sizing: border-box; font-size: 16px; color: #333; outline: none; resize: none; display: block; }
+        
         .action-bar { display: flex; align-items: center; gap: 10px; border-top: 1px solid #eee; padding-top: 5px; margin-top: 5px; }
         .add-img-btn { color: #764ba2; font-size: 1rem; cursor: pointer; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border: 1px dashed #764ba2; border-radius: 5px; background: #fff; }
         #image-preview { max-width: 35px; max-height: 35px; border-radius: 4px; display: none; object-fit: cover; }
 
         #post-btn { background: #ff7eb3; color: white; border: none; padding: 10px; border-radius: 30px; cursor: pointer; margin: 12px auto; font-size: 0.95rem; font-weight: bold; transition: 0.3s; display: block; }
 
-        /* --- 投稿カード（横幅を最大化） --- */
         #posts-list { width: 100%; margin-top: 20px; }
 
+        /* --- 投稿カード：幅を広げ、角に丸みをつける --- */
         .post-item { 
             background: rgba(0, 0, 0, 0.25); 
-            padding: 10px 12px; 
-            margin-bottom: 8px; 
+            padding: 12px 15px; 
+            margin-bottom: 12px; 
             border-left: 4px solid #ff7eb3; 
+            border-radius: 15px; /* ここで丸みを設定 */
             display: flex; 
             gap: 10px; 
             text-align: left;
-            width: calc(100% + 2rem); /* 左右のpadding分を広げる */
+            width: calc(100% + 2rem); 
             margin-left: -1rem; 
             box-sizing: border-box;
         }
@@ -65,12 +70,15 @@
             background: rgba(0, 0, 0, 0.15);
             border-left: 2px solid rgba(255,255,255,0.3);
             font-size: 0.8rem;
+            border-radius: 12px; /* 返信枠も少し丸く */
         }
 
         .post-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
         .post-content-area { flex: 1; min-width: 0; }
         
         .post-header { display: flex; justify-content: space-between; font-size: 0.7rem; opacity: 0.7; margin-bottom: 2px; }
+        
+        /* 投稿後の文字はあなたの好みに合わせて「小さめ」を維持 */
         .post-text { font-size: 0.82rem; line-height: 1.4; color: #fff; word-break: break-all; }
         .post-thumb { width: 80px; height: auto; border-radius: 6px; margin-top: 5px; cursor: zoom-in; }
         
@@ -78,7 +86,8 @@
         .icon-link { background: none; border: none; color: #fff; cursor: pointer; font-size: 0.75rem; opacity: 0.8; display: flex; align-items: center; gap: 3px; padding: 0; }
 
         .reply-input-area { display: none; margin-top: 8px; gap: 5px; }
-        .reply-input-area input { flex: 1; border-radius: 15px; border: none; padding: 6px 10px; font-size: 0.75rem; outline: none; }
+        /* 返信入力欄もズーム防止で16px */
+        .reply-input-area input { flex: 1; border-radius: 15px; border: none; padding: 6px 10px; font-size: 16px; outline: none; }
         .reply-send-btn { background: #ff7eb3; border: none; color: white; border-radius: 15px; padding: 4px 10px; font-size: 0.7rem; cursor: pointer; }
 
         .delete-btn { background: none; border: none; color: #ff6b6b; cursor: pointer; opacity: 0.4; font-size: 0.9rem; }
@@ -86,7 +95,6 @@
     </style>
 </head>
 <body>
-
 <div class="container">
     <h1>MindStream</h1>
     <div id="login-section"><button id="login-btn" style="padding: 12px 24px; font-size: 1rem; border-radius: 50px; background: #fff; color: #764ba2; border: none; font-weight: bold; cursor: pointer;">Googleログイン</button></div>
@@ -117,6 +125,7 @@
 <div id="modal" onclick="this.style.display='none'"><img id="modal-img" style="max-width:90%; max-height:90%;"></div>
 
 <script type="module">
+    // Script部分は前回と同じ（firebaseConfigを自分のものに差し替えてください）
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, doc, deleteDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
