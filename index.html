@@ -5,104 +5,122 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MindStream</title>
     <style>
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; margin: 0; color: #fff; padding: 20px 0; font-size: 0.85rem; }
+        body { 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            display: flex; justify-content: center; align-items: flex-start; 
+            min-height: 100vh; margin: 0; color: #fff; padding: 20px 0; font-size: 0.85rem;
+            transition: background 0.5s ease;
+        }
         
+        body.theme-sunset { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); }
+        body.theme-midnight { background: linear-gradient(135deg, #232526 0%, #414345 100%); }
+        body.theme-forest { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+
         .container { 
             background: rgba(255, 255, 255, 0.15); 
-            padding: 1.5rem 1rem; 
-            border-radius: 20px; 
+            padding: 1.5rem 1rem; border-radius: 20px; 
             box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
-            text-align: center; 
-            width: 95%; 
-            max-width: 500px; 
-            backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            box-sizing: border-box;
-            overflow: hidden; 
+            text-align: center; width: 95%; max-width: 500px; 
+            backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); 
+            box-sizing: border-box; overflow: hidden; position: relative;
         }
 
-        h1 { margin-bottom: 1.2rem; font-size: 1.5rem; letter-spacing: 2px; }
+        /* 通知ベル */
+        .notification-bell {
+            position: absolute; top: 20px; right: 20px; font-size: 1.2rem; cursor: pointer;
+        }
+        .bell-badge {
+            position: absolute; top: -2px; right: -2px; width: 8px; height: 8px;
+            background: #ff4b2b; border-radius: 50%; display: none;
+        }
+
+        .theme-picker { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+        .theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; }
+        .dot-twilight { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .dot-sunset { background: linear-gradient(135deg, #ff9a9e, #fad0c4); }
+        .dot-midnight { background: linear-gradient(135deg, #232526, #414345); }
+        .dot-forest { background: linear-gradient(135deg, #11998e, #38ef7d); }
+
+        /* 検索バー */
+        .search-box {
+            width: 92%; margin: 10px auto 15px; background: rgba(255,255,255,0.2);
+            border-radius: 10px; padding: 5px 10px; display: flex; align-items: center;
+        }
+        .search-box input {
+            background: transparent; border: none; color: white; width: 100%;
+            outline: none; font-size: 0.8rem;
+        }
+        .search-box input::placeholder { color: rgba(255,255,255,0.6); }
+
+        h1 { margin-bottom: 0.5rem; font-size: 1.5rem; letter-spacing: 2px; }
 
         .profile-bar, .input-group, #post-btn { width: 92%; margin-left: auto; margin-right: auto; }
-
         .profile-bar { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 50px; }
-        .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; background: #ddd; }
+        .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; }
         #user-name-input { width: 80px; padding: 5px; border-radius: 8px; border: none; text-align: center; font-size: 16px; font-weight: bold; }
-        .edit-btn, #logout-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; padding: 3px 8px; border-radius: 20px; font-size: 0.65rem; cursor: pointer; }
-
-        .input-group { background: rgba(255, 255, 255, 0.9); border-radius: 15px; padding: 10px; text-align: left; box-sizing: border-box; }
-        textarea { width: 100%; height: 50px; background: transparent; border: none; box-sizing: border-box; font-size: 16px; color: #333; outline: none; resize: none; display: block; }
         
-        .action-bar { display: flex; align-items: center; gap: 10px; border-top: 1px solid #eee; padding-top: 5px; margin-top: 5px; }
-        .add-img-btn { color: #764ba2; font-size: 1rem; cursor: pointer; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border: 1px dashed #764ba2; border-radius: 5px; background: #fff; }
-        #image-preview { max-width: 35px; max-height: 35px; border-radius: 4px; display: none; object-fit: cover; }
-
-        #post-btn { background: #ff7eb3; color: white; border: none; padding: 10px; border-radius: 30px; cursor: pointer; margin: 12px auto; font-size: 0.95rem; font-weight: bold; transition: 0.3s; display: block; }
+        .input-group { background: rgba(255, 255, 255, 0.9); border-radius: 15px; padding: 10px; text-align: left; box-sizing: border-box; }
+        textarea { width: 100%; height: 50px; background: transparent; border: none; font-size: 16px; color: #333; outline: none; resize: none; }
+        
+        #post-btn { background: #ff7eb3; color: white; border: none; padding: 10px; border-radius: 30px; cursor: pointer; margin: 12px auto; font-size: 0.95rem; font-weight: bold; width: 92%; display: block; }
 
         .post-item { 
-            background: rgba(0, 0, 0, 0.25); 
-            padding: 12px 15px; 
-            margin-bottom: 12px; 
-            border-left: 4px solid #ff7eb3; 
-            border-radius: 15px; 
-            display: flex; 
-            gap: 10px; 
-            text-align: left;
-            width: calc(100% + 2rem); 
-            margin-left: -1rem; 
-            box-sizing: border-box;
-            transition: all 0.4s ease; 
+            background: rgba(0, 0, 0, 0.25); padding: 12px 15px; margin-bottom: 12px; 
+            border-left: 4px solid #ff7eb3; border-radius: 15px; display: flex; gap: 10px; 
+            text-align: left; width: calc(100% + 2rem); margin-left: -1rem; 
+            box-sizing: border-box; transition: all 0.4s ease; 
         }
-        
         .fade-out { opacity: 0; transform: scale(0.9) translateX(20px); pointer-events: none; }
+        .reply-item { width: calc(100% + 2rem - 30px); margin-left: calc(-1rem + 30px); background: rgba(0, 0, 0, 0.15); font-size: 0.8rem; border-radius: 12px; }
 
-        .reply-item { width: calc(100% + 2rem - 30px); margin-left: calc(-1rem + 30px); background: rgba(0, 0, 0, 0.15); border-left: 2px solid rgba(255,255,255,0.3); font-size: 0.8rem; border-radius: 12px; }
-
-        .post-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-        .post-content-area { flex: 1; min-width: 0; }
-        .post-header { display: flex; justify-content: space-between; font-size: 0.7rem; opacity: 0.7; margin-bottom: 2px; }
-        .post-text { font-size: 0.82rem; line-height: 1.4; color: #fff; word-break: break-all; }
-        .post-thumb { width: 80px; height: auto; border-radius: 6px; margin-top: 5px; cursor: zoom-in; }
+        .post-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+        .post-text { font-size: 0.82rem; line-height: 1.4; color: #fff; word-break: break-all; margin-top: 3px; }
+        .post-footer { display: flex; gap: 15px; margin-top: 8px; }
+        .icon-link { background: none; border: none; color: #fff; cursor: pointer; font-size: 0.75rem; opacity: 0.8; padding: 0; }
         
-        .post-footer { display: flex; gap: 15px; margin-top: 6px; }
-        .icon-link { background: none; border: none; color: #fff; cursor: pointer; font-size: 0.75rem; opacity: 0.8; display: flex; align-items: center; gap: 3px; padding: 0; }
-
-        .reply-input-area { display: none; margin-top: 8px; gap: 5px; }
-        .reply-input-area input { flex: 1; border-radius: 15px; border: none; padding: 6px 10px; font-size: 16px; outline: none; }
-        .reply-send-btn { background: #ff7eb3; border: none; color: white; border-radius: 15px; padding: 4px 10px; font-size: 0.7rem; cursor: pointer; }
-
-        .delete-btn { background: none; border: none; color: #ff6b6b; cursor: pointer; opacity: 0.4; font-size: 0.9rem; padding: 5px; }
+        .delete-btn { background: none; border: none; color: #ff6b6b; cursor: pointer; opacity: 0.4; font-size: 0.9rem; }
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div class="notification-bell" id="bell-icon" onclick="clearNotification()">
+        🔔<div class="bell-badge" id="bell-badge"></div>
+    </div>
+
+    <div class="theme-picker" id="theme-picker" style="display:none;">
+        <div class="theme-dot dot-twilight" onclick="setTheme('twilight')"></div>
+        <div class="theme-dot dot-sunset" onclick="setTheme('sunset')"></div>
+        <div class="theme-dot dot-midnight" onclick="setTheme('midnight')"></div>
+        <div class="theme-dot dot-forest" onclick="setTheme('forest')"></div>
+    </div>
+    
     <h1>MindStream</h1>
+
     <div id="login-section"><button id="login-btn" style="padding: 12px 24px; font-size: 1rem; border-radius: 50px; background: #fff; color: #764ba2; border: none; font-weight: bold; cursor: pointer;">Googleログイン</button></div>
+
     <div id="app-section" style="display:none;">
-        <div class="profile-bar">
-            <label class="avatar-label" style="position:relative; cursor:pointer;">
-                <img id="my-avatar" class="user-avatar" src="https://www.gravatar.com/avatar/0000?d=mp">
-                <input type="file" id="avatar-input" accept="image/*" style="display:none;">
-            </label>
-            <div id="name-edit-mode"><input type="text" id="user-name-input"></div>
-            <div id="name-view-mode" style="display:none;"><span id="display-name" style="font-weight:bold;"></span> <button class="edit-btn" id="edit-name-btn">編集</button></div>
-            <button id="logout-btn">退出</button>
+        <div class="search-box">
+            🔍 <input type="text" id="search-input" placeholder="投稿を検索..." oninput="renderAll()">
         </div>
+
+        <div class="profile-bar">
+            <label style="cursor:pointer;"><img id="my-avatar" class="user-avatar" src="https://www.gravatar.com/avatar/0000?d=mp"><input type="file" id="avatar-input" accept="image/*" style="display:none;"></label>
+            <input type="text" id="user-name-input">
+            <button id="logout-btn" style="background:none; border:none; color:white; font-size:0.6rem; opacity:0.6;">退出</button>
+        </div>
+
         <div class="input-group">
             <textarea id="post-input" placeholder="今、何を考えてる？"></textarea>
-            <div class="action-bar">
-                <label class="add-img-btn">＋<input type="file" id="image-input" accept="image/*" style="display:none;"></label>
-                <img id="image-preview">
-            </div>
+            <label style="cursor:pointer; font-size: 0.8rem; color:#764ba2;">🖼️<input type="file" id="image-input" accept="image/*" style="display:none;"></label>
+            <img id="image-preview" style="max-width:30px; display:none;">
         </div>
         <button id="post-btn">つぶやく</button>
         <div id="posts-list"></div>
     </div>
 </div>
-
-<div id="modal" onclick="this.style.display='none'"><img id="modal-img" style="max-width:90%; max-height:90%;"></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -123,154 +141,108 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    let selectedImageData = null;
-    let customAvatarData = "https://www.gravatar.com/avatar/0000?d=mp";
+    let allPostsData = [];
+    let isInitialLoad = true;
 
-    document.getElementById('avatar-input').onchange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (f) => {
-                customAvatarData = f.target.result;
-                document.getElementById('my-avatar').src = customAvatarData;
-                localStorage.setItem('myAppAvatar', customAvatarData);
-            };
-            reader.readAsDataURL(file);
-        }
+    // テーマ設定
+    window.setTheme = (theme) => {
+        document.body.className = theme === 'twilight' ? '' : `theme-${theme}`;
+        localStorage.setItem('myAppTheme', theme);
+    };
+    const savedTheme = localStorage.getItem('myAppTheme');
+    if (savedTheme) setTheme(savedTheme);
+
+    // 通知クリア
+    window.clearNotification = () => {
+        document.getElementById('bell-badge').style.display = 'none';
     };
 
-    document.getElementById('image-input').onchange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (f) => {
-                selectedImageData = f.target.result;
-                document.getElementById('image-preview').src = selectedImageData;
-                document.getElementById('image-preview').style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    document.getElementById('post-btn').onclick = async () => {
-        const textEl = document.getElementById('post-input');
-        const name = document.getElementById('user-name-input').value || "No Name";
-        if (!textEl.value && !selectedImageData) return;
-        await addDoc(collection(db, "posts"), {
-            content: textEl.value,
-            userName: name,
-            userPhoto: customAvatarData,
-            imageData: selectedImageData,
-            likes: 0,
-            replyTo: null,
-            createdAt: serverTimestamp()
-        });
-        textEl.value = "";
-        selectedImageData = null;
-        document.getElementById('image-preview').style.display = 'none';
-        localStorage.setItem('myAppName', name);
-        document.getElementById('display-name').innerText = name;
-        toggleNameMode(true);
-    };
-
-    window.sendReply = async (postId) => {
-        const inputEl = document.getElementById(`reply-input-${postId}`);
-        const name = document.getElementById('user-name-input').value || "No Name";
-        if (!inputEl.value) return;
-        await addDoc(collection(db, "posts"), {
-            content: inputEl.value,
-            userName: name,
-            userPhoto: customAvatarData,
-            replyTo: postId,
-            createdAt: serverTimestamp()
-        });
-        inputEl.value = "";
-        document.getElementById(`reply-area-${postId}`).style.display = 'none';
-    };
-
-    window.toggleReply = (id) => {
-        const el = document.getElementById(`reply-area-${id}`);
-        el.style.display = el.style.display === 'flex' ? 'none' : 'flex';
-    };
-
-    window.likePost = async (id) => { await updateDoc(doc(db, "posts", id), { likes: increment(1) }); };
-
-    // --- ここを完全に修正しました ---
+    // 削除処理
     window.deletePost = async (id, domId) => {
         const el = document.getElementById(domId);
-        if (el) el.classList.add('fade-out'); // ダイアログなしでアニメーション開始
-        
-        setTimeout(async () => {
-            await deleteDoc(doc(db, "posts", id));
-        }, 400); // 0.4秒後にDBから消す
+        if (el) el.classList.add('fade-out');
+        setTimeout(async () => { await deleteDoc(doc(db, "posts", id)); }, 400);
     };
 
-    function toggleNameMode(isView) {
-        document.getElementById('name-edit-mode').style.display = isView ? 'none' : 'block';
-        document.getElementById('name-view-mode').style.display = isView ? 'block' : 'none';
-    }
+    // いいね
+    window.likePost = async (id) => {
+        await updateDoc(doc(db, "posts", id), { likes: increment(1) });
+    };
 
-    onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "asc")), (snapshot) => {
+    // 描画メイン関数（検索フィルター込み）
+    window.renderAll = () => {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
         const list = document.getElementById('posts-list');
         list.innerHTML = "";
-        const allPosts = [];
-        snapshot.forEach(doc => allPosts.push({id: doc.id, ...doc.data()}));
-        const parents = allPosts.filter(p => !p.replyTo).reverse();
+
+        const parents = allPostsData.filter(p => !p.replyTo).reverse();
         parents.forEach(parent => {
-            renderPost(parent, list, false);
-            const replies = allPosts.filter(r => r.replyTo === parent.id);
-            replies.forEach(reply => renderPost(reply, list, true));
+            if (parent.content.toLowerCase().includes(searchTerm) || parent.userName.toLowerCase().includes(searchTerm)) {
+                renderPost(parent, list, false);
+                const replies = allPostsData.filter(r => r.replyTo === parent.id);
+                replies.forEach(reply => renderPost(reply, list, true));
+            }
         });
-    });
+    };
 
     function renderPost(post, container, isReply) {
-        const dateStr = post.createdAt ? `${post.createdAt.toDate().getMonth()+1}/${post.createdAt.toDate().getDate()} ${post.createdAt.toDate().getHours()}:${String(post.createdAt.toDate().getMinutes()).padStart(2,'0')}` : '...';
-        const imgHtml = post.imageData ? `<img src="${post.imageData}" class="post-thumb" onclick="showModal('${post.imageData}')">` : '';
-        const domId = `post-${post.id}`; 
+        const domId = `post-${post.id}`;
         const div = document.createElement('div');
         div.className = `post-item ${isReply ? 'reply-item' : ''}`;
         div.id = domId;
         div.innerHTML = `
             <img src="${post.userPhoto || 'https://www.gravatar.com/avatar/0000?d=mp'}" class="post-avatar">
-            <div class="post-content-area">
-                <div class="post-header">
-                    <span><strong>${post.userName}</strong> <span style="opacity:0.6;">${dateStr}</span></span>
+            <div style="flex:1;">
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem; opacity:0.6;">
+                    <strong>${post.userName}</strong>
                     <button class="delete-btn" onclick="deletePost('${post.id}', '${domId}')">×</button>
                 </div>
                 <div class="post-text">${post.content}</div>
-                ${imgHtml}
                 <div class="post-footer">
                     <button class="icon-link" onclick="likePost('${post.id}')">❤️ ${post.likes || 0}</button>
-                    ${!isReply ? `<button class="icon-link" onclick="toggleReply('${post.id}')">💬</button>` : ''}
-                </div>
-                <div id="reply-area-${post.id}" class="reply-input-area">
-                    <input type="text" id="reply-input-${post.id}" placeholder="返信...">
-                    <button class="reply-send-btn" onclick="sendReply('${post.id}')">送信</button>
                 </div>
             </div>
         `;
         container.appendChild(div);
     }
 
+    // リアルタイム監視
+    onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "asc")), (snapshot) => {
+        const newPosts = [];
+        snapshot.forEach(doc => newPosts.push({id: doc.id, ...doc.data()}));
+        
+        // 初回読み込み以降、データが増えたら通知バッジを出す
+        if (!isInitialLoad && newPosts.length > allPostsData.length) {
+            document.getElementById('bell-badge').style.display = 'block';
+        }
+        
+        allPostsData = newPosts;
+        renderAll();
+        isInitialLoad = false;
+    });
+
+    // ログイン・投稿処理（以前と同様）
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            const savedName = localStorage.getItem('myAppName');
-            const savedAvatar = localStorage.getItem('myAppAvatar');
-            if(savedAvatar) { customAvatarData = savedAvatar; document.getElementById('my-avatar').src = savedAvatar; }
-            document.getElementById('user-name-input').value = savedName || user.displayName;
-            if(savedName) { document.getElementById('display-name').innerText = savedName; toggleNameMode(true); }
+            document.getElementById('user-name-input').value = localStorage.getItem('myAppName') || user.displayName;
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('app-section').style.display = 'block';
-        } else {
-            document.getElementById('login-section').style.display = 'block';
-            document.getElementById('app-section').style.display = 'none';
+            document.getElementById('theme-picker').style.display = 'flex';
         }
     });
 
     document.getElementById('login-btn').onclick = () => signInWithPopup(auth, provider);
+    document.getElementById('post-btn').onclick = async () => {
+        const textEl = document.getElementById('post-input');
+        const name = document.getElementById('user-name-input').value;
+        if (!textEl.value) return;
+        await addDoc(collection(db, "posts"), {
+            content: textEl.value, userName: name, likes: 0, replyTo: null, createdAt: serverTimestamp()
+        });
+        textEl.value = "";
+        localStorage.setItem('myAppName', name);
+    };
     document.getElementById('logout-btn').onclick = () => signOut(auth);
-    document.getElementById('edit-name-btn').onclick = () => toggleNameMode(false);
-    window.showModal = (src) => { document.getElementById('modal-img').src = src; document.getElementById('modal').style.display = 'flex'; };
 </script>
 </body>
 </html>
