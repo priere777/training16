@@ -47,19 +47,15 @@
         .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; }
         #user-name-input { width: 80px; padding: 5px; border-radius: 8px; border: none; text-align: center; font-size: 16px; font-weight: bold; }
         
-        /* 入力エリア */
         .input-group { background: rgba(255, 255, 255, 0.9); border-radius: 15px; padding: 10px; text-align: left; box-sizing: border-box; }
         textarea { width: 100%; height: 50px; background: transparent; border: none; font-size: 16px; color: #333; outline: none; resize: none; display: block; }
         
         .action-bar { display: flex; align-items: center; gap: 10px; border-top: 1px solid #eee; padding-top: 5px; margin-top: 5px; }
-        
-        /* +ボタンを元のデザインに戻しました */
         .add-img-btn { color: #764ba2; font-size: 1rem; cursor: pointer; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border: 1px dashed #764ba2; border-radius: 5px; background: #fff; }
         #image-preview { max-width: 35px; max-height: 35px; border-radius: 4px; display: none; object-fit: cover; }
 
         #post-btn { background: #ff7eb3; color: white; border: none; padding: 10px; border-radius: 30px; cursor: pointer; margin: 12px auto; font-size: 0.95rem; font-weight: bold; width: 92%; display: block; transition: 0.3s; }
 
-        /* 投稿カード：ピンクのライン（border-left）を消しました */
         .post-item { 
             background: rgba(0, 0, 0, 0.25); padding: 12px 15px; margin-bottom: 12px; 
             border-radius: 15px; display: flex; gap: 10px; 
@@ -69,7 +65,17 @@
         .fade-out { opacity: 0; transform: scale(0.9) translateX(20px); pointer-events: none; }
 
         .post-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
-        .post-text { font-size: 0.82rem; line-height: 1.4; color: #fff; word-break: break-all; margin-top: 3px; }
+
+        /* --- ここを修正しました！ --- */
+        .post-text { 
+            font-size: 0.82rem; 
+            line-height: 1.4; 
+            color: #fff; 
+            word-break: break-all; 
+            margin-top: 3px;
+            white-space: pre-wrap; /* これで改行が反映されます */
+        }
+        
         .post-footer { display: flex; gap: 15px; margin-top: 8px; position: relative; }
 
         .icon-link { background: none; border: none; color: #fff; cursor: pointer; font-size: 0.75rem; opacity: 0.8; padding: 0; display: flex; align-items: center; gap: 3px; position: relative; }
@@ -231,7 +237,6 @@
     };
     document.getElementById('logout-btn').onclick = () => signOut(auth);
 
-    // 画像選択プレビュー
     document.getElementById('image-input').onchange = (e) => {
         const file = e.target.files[0];
         if (file) {
