@@ -23,9 +23,7 @@
 
         h1 { margin-bottom: 1.2rem; font-size: 1.5rem; letter-spacing: 2px; }
 
-        .profile-bar, .input-group, #post-btn {
-            width: 92%; margin-left: auto; margin-right: auto;
-        }
+        .profile-bar, .input-group, #post-btn { width: 92%; margin-left: auto; margin-right: auto; }
 
         .profile-bar { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 50px; }
         .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; background: #ddd; }
@@ -41,9 +39,6 @@
 
         #post-btn { background: #ff7eb3; color: white; border: none; padding: 10px; border-radius: 30px; cursor: pointer; margin: 12px auto; font-size: 0.95rem; font-weight: bold; transition: 0.3s; display: block; }
 
-        #posts-list { width: 100%; margin-top: 20px; }
-
-        /* --- 投稿カードのデザイン --- */
         .post-item { 
             background: rgba(0, 0, 0, 0.25); 
             padding: 12px 15px; 
@@ -56,25 +51,12 @@
             width: calc(100% + 2rem); 
             margin-left: -1rem; 
             box-sizing: border-box;
-            transition: all 0.4s ease; /* アニメーション用 */
+            transition: all 0.4s ease; 
         }
         
-        /* 消える時のアニメーション */
-        .fade-out {
-            opacity: 0;
-            transform: scale(0.9);
-            margin-top: -60px; /* スッと詰める動き */
-            pointer-events: none;
-        }
+        .fade-out { opacity: 0; transform: scale(0.9) translateX(20px); pointer-events: none; }
 
-        .reply-item { 
-            width: calc(100% + 2rem - 30px); 
-            margin-left: calc(-1rem + 30px);
-            background: rgba(0, 0, 0, 0.15);
-            border-left: 2px solid rgba(255,255,255,0.3);
-            font-size: 0.8rem;
-            border-radius: 12px;
-        }
+        .reply-item { width: calc(100% + 2rem - 30px); margin-left: calc(-1rem + 30px); background: rgba(0, 0, 0, 0.15); border-left: 2px solid rgba(255,255,255,0.3); font-size: 0.8rem; border-radius: 12px; }
 
         .post-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
         .post-content-area { flex: 1; min-width: 0; }
@@ -98,7 +80,6 @@
 <div class="container">
     <h1>MindStream</h1>
     <div id="login-section"><button id="login-btn" style="padding: 12px 24px; font-size: 1rem; border-radius: 50px; background: #fff; color: #764ba2; border: none; font-weight: bold; cursor: pointer;">Googleログイン</button></div>
-    
     <div id="app-section" style="display:none;">
         <div class="profile-bar">
             <label class="avatar-label" style="position:relative; cursor:pointer;">
@@ -109,7 +90,6 @@
             <div id="name-view-mode" style="display:none;"><span id="display-name" style="font-weight:bold;"></span> <button class="edit-btn" id="edit-name-btn">編集</button></div>
             <button id="logout-btn">退出</button>
         </div>
-
         <div class="input-group">
             <textarea id="post-input" placeholder="今、何を考えてる？"></textarea>
             <div class="action-bar">
@@ -146,7 +126,6 @@
     let selectedImageData = null;
     let customAvatarData = "https://www.gravatar.com/avatar/0000?d=mp";
 
-    // アバター設定
     document.getElementById('avatar-input').onchange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -160,7 +139,6 @@
         }
     };
 
-    // 投稿画像設定
     document.getElementById('image-input').onchange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -174,12 +152,10 @@
         }
     };
 
-    // 投稿
     document.getElementById('post-btn').onclick = async () => {
         const textEl = document.getElementById('post-input');
         const name = document.getElementById('user-name-input').value || "No Name";
         if (!textEl.value && !selectedImageData) return;
-
         await addDoc(collection(db, "posts"), {
             content: textEl.value,
             userName: name,
@@ -197,12 +173,10 @@
         toggleNameMode(true);
     };
 
-    // 返信送信
     window.sendReply = async (postId) => {
         const inputEl = document.getElementById(`reply-input-${postId}`);
         const name = document.getElementById('user-name-input').value || "No Name";
         if (!inputEl.value) return;
-
         await addDoc(collection(db, "posts"), {
             content: inputEl.value,
             userName: name,
@@ -221,15 +195,14 @@
 
     window.likePost = async (id) => { await updateDoc(doc(db, "posts", id), { likes: increment(1) }); };
 
-    // --- スッと消える削除（アニメーション付き） ---
-    window.deletePost = async (id, elementId) => {
-        const el = document.getElementById(elementId);
-        if (el) el.classList.add('fade-out'); // アニメーション開始
+    // --- ここを完全に修正しました ---
+    window.deletePost = async (id, domId) => {
+        const el = document.getElementById(domId);
+        if (el) el.classList.add('fade-out'); // ダイアログなしでアニメーション開始
         
-        // アニメーションが終わるのを少し待ってからDBから削除
         setTimeout(async () => {
             await deleteDoc(doc(db, "posts", id));
-        }, 400);
+        }, 400); // 0.4秒後にDBから消す
     };
 
     function toggleNameMode(isView) {
@@ -237,7 +210,6 @@
         document.getElementById('name-view-mode').style.display = isView ? 'block' : 'none';
     }
 
-    // リアルタイム更新
     onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "asc")), (snapshot) => {
         const list = document.getElementById('posts-list');
         list.innerHTML = "";
@@ -254,7 +226,7 @@
     function renderPost(post, container, isReply) {
         const dateStr = post.createdAt ? `${post.createdAt.toDate().getMonth()+1}/${post.createdAt.toDate().getDate()} ${post.createdAt.toDate().getHours()}:${String(post.createdAt.toDate().getMinutes()).padStart(2,'0')}` : '...';
         const imgHtml = post.imageData ? `<img src="${post.imageData}" class="post-thumb" onclick="showModal('${post.imageData}')">` : '';
-        const domId = `post-${post.id}`; // アニメーション用にIDを付与
+        const domId = `post-${post.id}`; 
         const div = document.createElement('div');
         div.className = `post-item ${isReply ? 'reply-item' : ''}`;
         div.id = domId;
@@ -280,7 +252,6 @@
         container.appendChild(div);
     }
 
-    // 認証処理
     onAuthStateChanged(auth, (user) => {
         if (user) {
             const savedName = localStorage.getItem('myAppName');
