@@ -13,7 +13,6 @@
             transition: background 0.8s ease;
         }
         
-        /* 背景テーマ（改良版） */
         body.theme-sunset { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
         body.theme-midnight { background: linear-gradient(135deg, #09203f 0%, #537895 100%); }
         body.theme-forest { background: linear-gradient(135deg, #13547a 0%, #80d0c7 100%); }
@@ -27,91 +26,109 @@
             box-sizing: border-box; overflow: hidden; position: relative;
         }
 
-        /* 通知：シンプルな音符 */
-        .notification-note { position: absolute; top: 20px; right: 25px; font-size: 1.2rem; cursor: pointer; opacity: 0.8; }
+        /* --- 右上のアクションエリア --- */
+        .top-actions { position: absolute; top: 15px; right: 20px; display: flex; align-items: center; gap: 15px; z-index: 100; }
+        .notification-note { font-size: 1.2rem; cursor: pointer; opacity: 0.8; position: relative; }
         .note-badge { position: absolute; top: -2px; right: -5px; width: 8px; height: 8px; background: #fff; border-radius: 50%; display: none; box-shadow: 0 0 8px rgba(255,255,255,0.9); }
 
-        .theme-picker { display: flex; justify-content: center; gap: 12px; margin-bottom: 15px; }
-        .theme-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; transition: transform 0.2s; }
+        .user-menu { position: relative; }
+        .my-avatar-mini { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid #fff; cursor: pointer; object-fit: cover; }
+        
+        /* 設定パネル（ポップアップ） */
+        .settings-panel { 
+            position: absolute; top: 40px; right: 0; background: rgba(0,0,0,0.85); 
+            padding: 15px; border-radius: 15px; display: none; width: 180px;
+            backdrop-filter: blur(10px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: left;
+        }
+        .settings-panel h4 { margin: 0 0 10px; font-size: 0.75rem; opacity: 0.6; letter-spacing: 1px; }
+        .settings-panel input[type="text"] { 
+            width: 100%; background: rgba(255,255,255,0.1); border: none; color: white; 
+            padding: 8px; border-radius: 8px; font-size: 0.8rem; margin-bottom: 10px; outline: none; box-sizing: border-box;
+        }
+        .settings-panel label { 
+            display: block; font-size: 0.7rem; background: rgba(255,255,255,0.1); 
+            padding: 8px; border-radius: 8px; text-align: center; cursor: pointer; margin-bottom: 15px;
+        }
+        .logout-btn-ui { color: #ff6b6b; font-size: 0.75rem; font-weight: bold; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; cursor: pointer; text-align: center; }
+
+        .theme-picker { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; }
+        .theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; transition: transform 0.2s; }
         .dot-twilight { background: linear-gradient(135deg, #667eea, #764ba2); }
         .dot-sunset { background: linear-gradient(135deg, #f6d365, #fda085); }
         .dot-midnight { background: linear-gradient(135deg, #09203f, #537895); }
         .dot-forest { background: linear-gradient(135deg, #13547a, #80d0c7); }
 
-        .search-box { width: 92%; margin: 10px auto 15px; background: rgba(255,255,255,0.2); border-radius: 10px; padding: 5px 10px; display: flex; align-items: center; }
-        .search-box input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 0.8rem; }
-        .search-box input::placeholder { color: rgba(255,255,255,0.6); }
+        .search-box { width: 92%; margin: 0 auto 20px; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.1); box-sizing: border-box; }
+        .search-box input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 0.8rem; margin-left: 8px; }
+        .search-box input::placeholder { color: rgba(255,255,255,0.5); }
 
-        h1 { margin-bottom: 0.5rem; font-size: 1.5rem; letter-spacing: 2px; }
+        h1 { margin: 10px 0 25px; font-size: 1.6rem; letter-spacing: 3px; font-weight: 200; }
 
-        .profile-bar, .input-group, #post-btn { width: 92%; margin-left: auto; margin-right: auto; }
-        .profile-bar { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 50px; }
-        .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; }
-        #user-name-input { width: 80px; padding: 5px; border-radius: 8px; border: none; text-align: center; font-size: 16px; font-weight: bold; }
+        .input-group { background: rgba(255, 255, 255, 0.9); border-radius: 15px; padding: 12px; text-align: left; box-sizing: border-box; position: relative; margin: 0 auto; width: 92%; }
+        textarea { width: 100%; height: 60px; background: transparent; border: none; font-size: 1rem; color: #333; outline: none; resize: none; display: block; }
+        .char-count { position: absolute; bottom: 50px; right: 15px; font-size: 0.65rem; color: #bbb; pointer-events: none; }
         
-        .input-group { background: rgba(255, 255, 255, 0.9); border-radius: 15px; padding: 10px; text-align: left; box-sizing: border-box; position: relative; }
-        textarea { width: 100%; height: 50px; background: transparent; border: none; font-size: 16px; color: #333; outline: none; resize: none; display: block; }
-        .char-count { position: absolute; bottom: 45px; right: 15px; font-size: 0.65rem; color: #bbb; pointer-events: none; }
-        
-        .action-bar { display: flex; align-items: center; gap: 10px; border-top: 1px solid #eee; padding-top: 5px; margin-top: 5px; }
-        .add-img-btn { color: #764ba2; font-size: 1rem; cursor: pointer; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border: 1px dashed #764ba2; border-radius: 5px; background: #fff; }
+        .action-bar { display: flex; align-items: center; gap: 10px; border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; }
+        .add-img-btn { color: #764ba2; font-size: 1rem; cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: 1px dashed #764ba2; border-radius: 6px; background: #fff; }
         #image-preview { max-width: 35px; max-height: 35px; border-radius: 4px; display: none; object-fit: cover; }
 
-        /* --- ボタンの色調整：ここを修正しました！ --- */
         #post-btn { 
-            background: #ff7eb3; /* Twilight */
-            color: white; border: none; padding: 10px; border-radius: 30px; 
-            cursor: pointer; margin: 12px auto; font-size: 0.95rem; font-weight: bold; 
+            background: #ff7eb3; color: white; border: none; padding: 12px; border-radius: 30px; 
+            cursor: pointer; margin: 15px auto; font-size: 0.95rem; font-weight: bold; 
             width: 92%; display: block; transition: all 0.5s ease; 
         }
-        /* body.theme-名 #post-btn の形式で色を上書き */
+        #post-btn:disabled { background: #ccc !important; cursor: not-allowed; opacity: 0.6; }
         body.theme-sunset #post-btn { background: #ff7f50 !important; }
         body.theme-midnight #post-btn { background: #4a69bd !important; }
         body.theme-forest #post-btn { background: #2d9687 !important; }
 
-        #post-btn:disabled { background: #ccc !important; cursor: not-allowed; opacity: 0.6; }
-
         .post-item { 
-            background: rgba(0, 0, 0, 0.2); padding: 12px 15px; margin-bottom: 12px; 
-            border-radius: 15px; display: flex; gap: 10px; 
+            background: rgba(0, 0, 0, 0.2); padding: 15px; margin-bottom: 12px; 
+            border-radius: 18px; display: flex; gap: 12px; 
             text-align: left; width: calc(100% + 2rem); margin-left: -1rem; 
             box-sizing: border-box; transition: all 0.4s ease; 
         }
         .fade-out { opacity: 0; transform: scale(0.9) translateX(20px); pointer-events: none; }
-        .post-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
-        .post-text { font-size: 0.82rem; line-height: 1.4; color: #fff; word-break: break-all; margin-top: 3px; white-space: pre-wrap; }
-        .post-footer { display: flex; gap: 15px; margin-top: 8px; position: relative; }
-
-        .icon-link { background: none; border: none; color: #fff; cursor: pointer; font-size: 0.75rem; opacity: 0.8; padding: 0; display: flex; align-items: center; gap: 3px; position: relative; }
-        .like-pop { animation: heartPop 0.4s ease-out; }
-        @keyframes heartPop { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
-        .particle { position: absolute; pointer-events: none; font-size: 12px; animation: particleFly 0.6s ease-out forwards; }
-        @keyframes particleFly { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; } }
-
-        .delete-btn { background: none; border: none; color: #ff6b6b; cursor: pointer; opacity: 0.4; font-size: 0.9rem; }
+        .post-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+        .post-text { font-size: 0.85rem; line-height: 1.5; color: #fff; word-break: break-all; margin-top: 4px; white-space: pre-wrap; }
+        .delete-btn { background: none; border: none; color: #ff6b6b; cursor: pointer; opacity: 0.3; font-size: 1rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="notification-note" id="note-icon" onclick="clearNotification()">
-        ♪<div class="note-badge" id="note-badge"></div>
+    <div id="app-section-header" style="display:none;">
+        <div class="top-actions">
+            <div class="user-menu">
+                <img id="my-avatar" class="my-avatar-mini" src="https://www.gravatar.com/avatar/0000?d=mp" onclick="toggleSettings()">
+                <div id="settings-panel" class="settings-panel">
+                    <h4>SETTINGS</h4>
+                    <input type="text" id="edit-name" placeholder="名前を変更" onblur="updateProfileName()">
+                    <label>📸 写真を変更<input type="file" id="edit-avatar" accept="image/*" style="display:none;" onchange="updateProfilePhoto(this)"></label>
+                    <div class="logout-btn-ui" onclick="handleLogout()">退出する</div>
+                </div>
+            </div>
+            <div class="notification-note" id="note-icon" onclick="clearNotification()">
+                ♪<div class="note-badge" id="note-badge"></div>
+            </div>
+        </div>
     </div>
+
+    <h1>MindStream</h1>
+
     <div class="theme-picker" id="theme-picker" style="display:none;">
         <div class="theme-dot dot-twilight" onclick="setTheme('twilight')"></div>
         <div class="theme-dot dot-sunset" onclick="setTheme('sunset')"></div>
         <div class="theme-dot dot-midnight" onclick="setTheme('midnight')"></div>
         <div class="theme-dot dot-forest" onclick="setTheme('forest')"></div>
     </div>
-    <h1>MindStream</h1>
-    <div id="login-section"><button id="login-btn" style="padding: 12px 24px; font-size: 1rem; border-radius: 50px; background: #fff; color: #764ba2; border: none; font-weight: bold; cursor: pointer;">Googleログイン</button></div>
+
+    <div id="login-section" style="padding: 20px 0;">
+        <button id="login-btn" style="padding: 15px 30px; font-size: 1rem; border-radius: 50px; background: #fff; color: #764ba2; border: none; font-weight: bold; cursor: pointer;">Googleでログイン</button>
+    </div>
+
     <div id="app-section" style="display:none;">
-        <div class="search-box">🔍 <input type="text" id="search-input" placeholder="投稿を検索..." oninput="renderAll()"></div>
-        <div class="profile-bar">
-            <label style="cursor:pointer;"><img id="my-avatar" class="user-avatar" src="https://www.gravatar.com/avatar/0000?d=mp"><input type="file" id="avatar-input" accept="image/*" style="display:none;"></label>
-            <input type="text" id="user-name-input">
-            <button id="logout-btn" style="background:none; border:none; color:white; font-size:0.6rem; opacity:0.6;">退出</button>
-        </div>
+        <div class="search-box">🔍<input type="text" id="search-input" placeholder="投稿を検索..." oninput="renderAll()"></div>
         <div class="input-group">
             <textarea id="post-input" maxlength="140" placeholder="今、何を考えてる？"></textarea>
             <div id="char-counter" class="char-count">140</div>
@@ -146,17 +163,50 @@
 
     let allPostsData = [];
     let isInitialLoad = true;
+    let currentUserData = { name: "Guest", photo: "" };
 
+    // --- 設定パネル制御 ---
+    window.toggleSettings = () => {
+        const panel = document.getElementById('settings-panel');
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    };
+
+    window.updateProfileName = () => {
+        const newName = document.getElementById('edit-name').value.trim();
+        if (newName) {
+            currentUserData.name = newName;
+            localStorage.setItem('savedUserName', newName);
+        }
+    };
+
+    window.updateProfilePhoto = (input) => {
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentUserData.photo = e.target.result;
+                document.getElementById('my-avatar').src = e.target.result;
+                localStorage.setItem('savedUserPhoto', e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    window.handleLogout = () => signOut(auth);
+
+    window.addEventListener('click', (e) => {
+        if (!e.target.closest('.user-menu')) document.getElementById('settings-panel').style.display = 'none';
+    });
+
+    // --- 基本機能 ---
     const postInput = document.getElementById('post-input');
     const charCounter = document.getElementById('char-counter');
     const postBtn = document.getElementById('post-btn');
 
     postInput.addEventListener('input', () => {
         const length = postInput.value.length;
-        const remaining = 140 - length;
-        charCounter.textContent = remaining;
-        charCounter.style.color = remaining < 20 ? "#ff4b2b" : "#bbb";
-        postBtn.disabled = length === 0 || remaining < 0;
+        charCounter.textContent = 140 - length;
+        postBtn.disabled = length === 0;
     });
 
     window.setTheme = (theme) => {
@@ -174,72 +224,55 @@
         setTimeout(async () => { await deleteDoc(doc(db, "posts", id)); }, 400);
     };
 
-    window.likePost = async (btn, id) => {
-        btn.classList.add('like-pop');
-        setTimeout(() => btn.classList.remove('like-pop'), 400);
-        for (let i = 0; i < 6; i++) {
-            const p = document.createElement('span');
-            p.innerText = '❤️';
-            p.className = 'particle';
-            p.style.setProperty('--tx', `${(Math.random() - 0.5) * 100}px`);
-            p.style.setProperty('--ty', `${(Math.random() - 0.5) * 100}px`);
-            p.style.left = '10px'; p.style.top = '0px';
-            btn.appendChild(p);
-            setTimeout(() => p.remove(), 600);
-        }
-        await updateDoc(doc(db, "posts", id), { likes: increment(1) });
-    };
-
     window.renderAll = () => {
         const searchTerm = document.getElementById('search-input').value.toLowerCase();
         const list = document.getElementById('posts-list');
         list.innerHTML = "";
-        const parents = allPostsData.filter(p => !p.replyTo).reverse();
-        parents.forEach(parent => {
-            if (parent.content.toLowerCase().includes(searchTerm) || parent.userName.toLowerCase().includes(searchTerm)) {
-                renderPost(parent, list);
+        allPostsData.slice().reverse().forEach(post => {
+            if (post.content.toLowerCase().includes(searchTerm) || post.userName.toLowerCase().includes(searchTerm)) {
+                const domId = `post-${post.id}`;
+                const div = document.createElement('div');
+                div.className = `post-item`; div.id = domId;
+                div.innerHTML = `
+                    <img src="${post.userPhoto || 'https://www.gravatar.com/avatar/0000?d=mp'}" class="post-avatar">
+                    <div style="flex:1;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.75rem; opacity:0.6; margin-bottom:2px;">
+                            <strong>${post.userName}</strong>
+                            <button class="delete-btn" onclick="deletePost('${post.id}', '${domId}')">×</button>
+                        </div>
+                        <div class="post-text">${post.content}</div>
+                        <div style="margin-top:8px;">
+                            <button style="background:none; border:none; color:white; cursor:pointer; font-size:0.8rem; opacity:0.7;" onclick="updateDoc(doc(db, 'posts', '${post.id}'), {likes: increment(1)})">❤️ ${post.likes || 0}</button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(div);
             }
         });
     };
 
-    function renderPost(post, container) {
-        const domId = `post-${post.id}`;
-        const div = document.createElement('div');
-        div.className = `post-item`;
-        div.id = domId;
-        div.innerHTML = `
-            <img src="${post.userPhoto || 'https://www.gravatar.com/avatar/0000?d=mp'}" class="post-avatar">
-            <div style="flex:1;">
-                <div style="display:flex; justify-content:space-between; font-size:0.7rem; opacity:0.6;">
-                    <strong>${post.userName}</strong>
-                    <button class="delete-btn" onclick="deletePost('${post.id}', '${domId}')">×</button>
-                </div>
-                <div class="post-text">${post.content}</div>
-                <div class="post-footer">
-                    <button class="icon-link" onclick="likePost(this, '${post.id}')">❤️ ${post.likes || 0}</button>
-                </div>
-            </div>
-        `;
-        container.appendChild(div);
-    }
-
     onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "asc")), (snapshot) => {
         const newPosts = [];
         snapshot.forEach(doc => newPosts.push({id: doc.id, ...doc.data()}));
-        if (!isInitialLoad && newPosts.length > allPostsData.length) {
-            document.getElementById('note-badge').style.display = 'block';
-        }
-        allPostsData = newPosts;
-        renderAll();
-        isInitialLoad = false;
+        if (!isInitialLoad && newPosts.length > allPostsData.length) document.getElementById('note-badge').style.display = 'block';
+        allPostsData = newPosts; renderAll(); isInitialLoad = false;
     });
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            document.getElementById('user-name-input').value = localStorage.getItem('myAppName') || user.displayName;
+            currentUserData.name = localStorage.getItem('savedUserName') || user.displayName;
+            currentUserData.photo = localStorage.getItem('savedUserPhoto') || user.photoURL;
+            document.getElementById('my-avatar').src = currentUserData.photo;
+            document.getElementById('edit-name').value = currentUserData.name;
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('app-section').style.display = 'block';
+            document.getElementById('app-section-header').style.display = 'block';
             document.getElementById('theme-picker').style.display = 'flex';
+        } else {
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('app-section').style.display = 'none';
+            document.getElementById('app-section-header').style.display = 'none';
+            document.getElementById('theme-picker').style.display = 'none';
         }
     });
 
@@ -248,24 +281,9 @@
         const textEl = document.getElementById('post-input');
         if (!textEl.value) return;
         await addDoc(collection(db, "posts"), {
-            content: textEl.value, userName: document.getElementById('user-name-input').value, likes: 0, replyTo: null, createdAt: serverTimestamp()
+            content: textEl.value, userName: currentUserData.name, userPhoto: currentUserData.photo, likes: 0, createdAt: serverTimestamp()
         });
-        textEl.value = "";
-        charCounter.textContent = "140";
-        postBtn.disabled = true;
-    };
-    document.getElementById('logout-btn').onclick = () => signOut(auth);
-
-    document.getElementById('image-input').onchange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (f) => {
-                document.getElementById('image-preview').src = f.target.result;
-                document.getElementById('image-preview').style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        }
+        textEl.value = ""; charCounter.textContent = "140"; postBtn.disabled = true;
     };
 </script>
 </body>
