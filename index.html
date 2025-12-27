@@ -12,9 +12,16 @@
             min-height: 100vh; margin: 0; color: #fff; padding: 20px 0; font-size: 0.85rem;
             transition: background 0.8s ease;
         }
+        
+        /* テーマごとの背景とボタン色の指定 */
         body.theme-sunset { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
+        body.theme-sunset #post-btn { background: #ff7f50 !important; }
+
         body.theme-midnight { background: linear-gradient(135deg, #09203f 0%, #537895 100%); }
+        body.theme-midnight #post-btn { background: #4a69bd !important; }
+
         body.theme-forest { background: linear-gradient(135deg, #13547a 0%, #80d0c7 100%); }
+        body.theme-forest #post-btn { background: #2d9687 !important; }
 
         .container { 
             background: rgba(255, 255, 255, 0.15); 
@@ -25,13 +32,13 @@
             box-sizing: border-box; position: relative;
         }
 
-        /* ヘッダー周り */
         .top-actions { position: absolute; top: 15px; right: 20px; display: flex; align-items: center; gap: 15px; z-index: 100; }
         .notification-note { font-size: 1.2rem; cursor: pointer; opacity: 0.8; position: relative; }
         .note-badge { position: absolute; top: -2px; right: -5px; width: 8px; height: 8px; background: #fff; border-radius: 50%; display: none; }
-        
+
         .user-menu { position: relative; }
         .my-avatar-mini { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid #fff; cursor: pointer; object-fit: cover; background: rgba(255,255,255,0.2); }
+        
         .settings-panel { 
             position: absolute; top: 40px; right: 0; background: rgba(0,0,0,0.85); 
             padding: 15px; border-radius: 15px; display: none; width: 180px; text-align: left;
@@ -42,7 +49,6 @@
 
         h1 { margin: 10px 0 25px; font-size: 1.6rem; letter-spacing: 3px; font-weight: 300; }
 
-        /* テーマ選択：横並び */
         .theme-picker { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; }
         .theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; }
         .dot-twilight { background: linear-gradient(135deg, #667eea, #764ba2); }
@@ -50,18 +56,17 @@
         .dot-midnight { background: linear-gradient(135deg, #09203f, #537895); }
         .dot-forest { background: linear-gradient(135deg, #13547a, #80d0c7); }
 
-        /* 入力エリア */
         .input-group { background: rgba(255, 255, 255, 0.9); border-radius: 15px; padding: 12px; text-align: left; margin: 0 auto; width: 92%; box-sizing: border-box; }
         textarea { width: 100%; height: 60px; border: none; font-size: 1rem; outline: none; resize: none; color: #333; background: transparent; }
+        
         .action-bar { display: flex; align-items: center; gap: 10px; border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; }
         .add-img-btn { color: #764ba2; border: 1px dashed #764ba2; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; }
         #preview-container { display: flex; gap: 5px; overflow-x: auto; }
         .preview-img { width: 35px; height: 35px; border-radius: 4px; object-fit: cover; }
 
-        #post-btn { background: #ff7eb3; color: white; border: none; padding: 12px; border-radius: 30px; cursor: pointer; margin: 15px auto; font-size: 0.95rem; font-weight: bold; width: 92%; display: block; }
+        #post-btn { background: #ff7eb3; color: white; border: none; padding: 12px; border-radius: 30px; cursor: pointer; margin: 15px auto; font-size: 0.95rem; font-weight: bold; width: 92%; display: block; transition: background 0.3s; }
         #post-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* 投稿一覧 */
         .post-item { background: rgba(0, 0, 0, 0.2); padding: 15px; margin-bottom: 12px; border-radius: 18px; display: flex; gap: 12px; text-align: left; }
         .post-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
         .post-content-area { flex: 1; overflow: hidden; }
