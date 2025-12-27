@@ -13,13 +13,10 @@
             transition: background 0.8s ease;
         }
         
-        /* テーマごとの背景とボタン色の指定 */
         body.theme-sunset { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
         body.theme-sunset #post-btn { background: #ff7f50 !important; }
-
         body.theme-midnight { background: linear-gradient(135deg, #09203f 0%, #537895 100%); }
         body.theme-midnight #post-btn { background: #4a69bd !important; }
-
         body.theme-forest { background: linear-gradient(135deg, #13547a 0%, #80d0c7 100%); }
         body.theme-forest #post-btn { background: #2d9687 !important; }
 
@@ -33,10 +30,6 @@
         }
 
         .top-actions { position: absolute; top: 15px; right: 20px; display: flex; align-items: center; gap: 15px; z-index: 100; }
-        .notification-note { font-size: 1.2rem; cursor: pointer; opacity: 0.8; position: relative; }
-        .note-badge { position: absolute; top: -2px; right: -5px; width: 8px; height: 8px; background: #fff; border-radius: 50%; display: none; }
-
-        .user-menu { position: relative; }
         .my-avatar-mini { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid #fff; cursor: pointer; object-fit: cover; background: rgba(255,255,255,0.2); }
         
         .settings-panel { 
@@ -45,7 +38,6 @@
         }
         .settings-panel input { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 8px; border: none; font-size: 0.8rem; box-sizing: border-box; }
         .settings-panel label { display: block; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px; text-align: center; cursor: pointer; font-size: 0.7rem; margin-bottom: 10px; }
-        .logout-btn-ui { color: #ff6b6b; font-size: 0.75rem; text-align: center; cursor: pointer; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
 
         h1 { margin: 10px 0 25px; font-size: 1.6rem; letter-spacing: 3px; font-weight: 300; }
 
@@ -56,6 +48,10 @@
         .dot-midnight { background: linear-gradient(135deg, #09203f, #537895); }
         .dot-forest { background: linear-gradient(135deg, #13547a, #80d0c7); }
 
+        /* 検索ボックス */
+        .search-box { width: 92%; margin: 0 auto 15px; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.1); }
+        .search-box input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 0.8rem; margin-left: 8px; }
+
         .input-group { background: rgba(255, 255, 255, 0.9); border-radius: 15px; padding: 12px; text-align: left; margin: 0 auto; width: 92%; box-sizing: border-box; }
         textarea { width: 100%; height: 60px; border: none; font-size: 1rem; outline: none; resize: none; color: #333; background: transparent; }
         
@@ -65,8 +61,9 @@
         .preview-img { width: 35px; height: 35px; border-radius: 4px; object-fit: cover; }
 
         #post-btn { background: #ff7eb3; color: white; border: none; padding: 12px; border-radius: 30px; cursor: pointer; margin: 15px auto; font-size: 0.95rem; font-weight: bold; width: 92%; display: block; transition: background 0.3s; }
-        #post-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #post-btn:disabled { opacity: 0.5; }
 
+        /* 投稿スタイル */
         .post-item { background: rgba(0, 0, 0, 0.2); padding: 15px; margin-bottom: 12px; border-radius: 18px; display: flex; gap: 12px; text-align: left; }
         .post-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
         .post-content-area { flex: 1; overflow: hidden; }
@@ -74,6 +71,10 @@
         .post-info { font-size: 0.75rem; opacity: 0.7; }
         .post-time { font-size: 0.65rem; margin-left: 8px; }
         .delete-btn { background: none; border: none; color: #ff6b6b; cursor: pointer; font-size: 1.1rem; opacity: 0.5; }
+
+        /* ハッシュタグのリンク色 */
+        .hashtag { color: #82ccdd; cursor: pointer; font-weight: bold; text-decoration: none; }
+        .hashtag:hover { text-decoration: underline; }
 
         .image-slider { display: flex; gap: 8px; overflow-x: auto; margin-top: 10px; scroll-snap-type: x mandatory; scrollbar-width: none; }
         .image-slider::-webkit-scrollbar { display: none; }
@@ -90,10 +91,9 @@
                 <div id="settings-panel" class="settings-panel">
                     <input type="text" id="edit-name" placeholder="名前を変更" onblur="updateProfileName()">
                     <label>📸 写真を変更<input type="file" id="edit-avatar" accept="image/*" style="display:none;" onchange="updateProfilePhoto(this)"></label>
-                    <div class="logout-btn-ui" onclick="handleLogout()">退出する</div>
                 </div>
             </div>
-            <div class="notification-note" onclick="document.getElementById('note-badge').style.display='none'">♪<div class="note-badge" id="note-badge"></div></div>
+            <div class="notification-note">♪</div>
         </div>
     </div>
 
@@ -111,8 +111,10 @@
     </div>
 
     <div id="app-section" style="display:none;">
+        <div class="search-box">🔍<input type="text" id="tag-search" placeholder="タグやワードで検索..." oninput="renderPosts()"></div>
+
         <div class="input-group">
-            <textarea id="post-input" maxlength="140" placeholder="今、何を考えてる？"></textarea>
+            <textarea id="post-input" maxlength="140" placeholder="今、何を考えてる？ #タグ もOK"></textarea>
             <div class="action-bar">
                 <label class="add-img-btn">＋<input type="file" id="image-input" accept="image/*" multiple style="display:none;" onchange="handleImageSelect(this)"></label>
                 <div id="preview-container"></div>
@@ -145,13 +147,27 @@
 
     let selectedImages = [];
     let currentUserData = { name: "Guest", photo: DEFAULT_AVATAR };
+    let allPosts = [];
 
     window.toggleSettings = () => { const p = document.getElementById('settings-panel'); p.style.display = p.style.display === 'block' ? 'none' : 'block'; };
-    window.handleLogout = () => signOut(auth);
     window.updateProfileName = () => { const n = document.getElementById('edit-name').value.trim(); if(n){ currentUserData.name = n; localStorage.setItem('savedUserName', n); } };
     window.updateProfilePhoto = (i) => { const f = i.files[0]; if(f){ const r = new FileReader(); r.onload=(e)=>{ currentUserData.photo=e.target.result; document.getElementById('my-avatar').src=e.target.result; localStorage.setItem('savedUserPhoto', e.target.result); }; r.readAsDataURL(f); } };
     window.setTheme = (t) => { document.body.className = t === 'twilight' ? '' : `theme-${t}`; localStorage.setItem('myAppTheme', t); };
     window.deletePost = async (id) => { await deleteDoc(doc(db, "posts", id)); };
+
+    // 2. ハッシュタグ検索を実行する関数
+    window.searchTag = (tag) => {
+        const searchInput = document.getElementById('tag-search');
+        searchInput.value = tag;
+        renderPosts();
+    };
+
+    // 3. テキスト内のハッシュタグをリンク化する関数
+    const formatContent = (text) => {
+        return text.replace(/[#＃]([A-Za-z0-9ぁ-ヶ亜-慶尊-梛]+)/g, (match, tag) => {
+            return `<span class="hashtag" onclick="searchTag('${match}')">${match}</span>`;
+        });
+    };
 
     window.handleImageSelect = (input) => {
         const files = Array.from(input.files);
@@ -167,11 +183,15 @@
         });
     };
 
-    onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "asc")), (snap) => {
+    const renderPosts = () => {
+        const filter = document.getElementById('tag-search').value.toLowerCase();
         const list = document.getElementById('posts-list');
         list.innerHTML = "";
-        snap.docs.slice().reverse().forEach(d => {
-            const post = d.data();
+        
+        allPosts.slice().reverse().forEach(postData => {
+            const post = postData.data;
+            if (filter && !post.content.toLowerCase().includes(filter)) return;
+
             const dateStr = post.createdAt ? new Date(post.createdAt.seconds * 1000).toLocaleString('ja-JP', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
             const imgHtml = (post.images && post.images.length > 0) ? `<div class="image-slider">${post.images.map(src => `<img src="${src}" class="slider-img">`).join('')}</div>` : "";
             const div = document.createElement('div');
@@ -181,13 +201,18 @@
                 <div class="post-content-area">
                     <div class="post-header">
                         <div class="post-info"><strong>${post.userName}</strong><span class="post-time">${dateStr}</span></div>
-                        <button class="delete-btn" onclick="deletePost('${d.id}')">×</button>
+                        <button class="delete-btn" onclick="deletePost('${postData.id}')">×</button>
                     </div>
-                    <div style="white-space:pre-wrap;">${post.content}</div>
+                    <div style="white-space:pre-wrap;">${formatContent(post.content)}</div>
                     ${imgHtml}
                 </div>`;
             list.appendChild(div);
         });
+    };
+
+    onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "asc")), (snap) => {
+        allPosts = snap.docs.map(d => ({id: d.id, data: d.data()}));
+        renderPosts();
     });
 
     onAuthStateChanged(auth, (user) => {
