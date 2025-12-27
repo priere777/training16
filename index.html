@@ -47,7 +47,8 @@
 
         h1 { margin: 10px 0 25px; font-size: 1.6rem; letter-spacing: 3px; font-weight: 300; }
 
-        .theme-picker { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; }
+        /* --- カラー選択：横並びに固定 --- */
+        .theme-picker { display: flex !important; justify-content: center; gap: 12px; margin-bottom: 20px; flex-direction: row !important; }
         .theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; transition: transform 0.2s; }
         .dot-twilight { background: linear-gradient(135deg, #667eea, #764ba2); }
         .dot-sunset { background: linear-gradient(135deg, #f6d365, #fda085); }
@@ -71,10 +72,16 @@
 
         .post-item { background: rgba(0, 0, 0, 0.2); padding: 15px; margin-bottom: 12px; border-radius: 18px; display: flex; gap: 12px; text-align: left; width: calc(100% + 2rem); margin-left: -1rem; box-sizing: border-box; }
         .post-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; background: rgba(255,255,255,0.1); }
+        
+        /* --- 投稿ヘッダー：名前と時間を左、削除を右に --- */
+        .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .post-author-box { display: flex; align-items: center; font-size: 0.75rem; opacity: 0.6; }
+        .post-time { font-size: 0.6rem; margin-left: 8px; }
+        .delete-btn { background: none; border: none; color: #ff6b6b; cursor: pointer; opacity: 0.4; font-size: 1.1rem; line-height: 1; padding: 0 4px; }
+
         .image-slider { display: flex; gap: 8px; overflow-x: auto; margin-top: 10px; scroll-snap-type: x mandatory; scrollbar-width: none; }
         .image-slider::-webkit-scrollbar { display: none; }
         .slider-img { width: 85%; max-height: 250px; border-radius: 10px; object-fit: cover; scroll-snap-align: center; flex-shrink: 0; }
-        .delete-btn { background: none; border: none; color: #ff6b6b; cursor: pointer; opacity: 0.3; font-size: 1rem; }
     </style>
 </head>
 <body>
@@ -95,6 +102,7 @@
     </div>
 
     <h1>MindStream</h1>
+    
     <div class="theme-picker" id="theme-picker" style="display:none;">
         <div class="theme-dot dot-twilight" onclick="setTheme('twilight')"></div>
         <div class="theme-dot dot-sunset" onclick="setTheme('sunset')"></div>
@@ -123,9 +131,7 @@
     import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, doc, deleteDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // ==========================================
     // 🔑 ここにFirebaseの設定を貼り付けてください
-    // ==========================================
     const firebaseConfig = {
         apiKey: "AIzaSyCfGIVvrrqwnXeX5CtygES1dv8k7CobzU8",
   authDomain: "mindstream-app.firebaseapp.com",
@@ -151,7 +157,7 @@
     window.updateProfilePhoto = (i) => { const f = i.files[0]; if(f){ const r = new FileReader(); r.onload=(e)=>{ currentUserData.photo=e.target.result; document.getElementById('my-avatar').src=e.target.result; localStorage.setItem('savedUserPhoto', e.target.result); }; r.readAsDataURL(f); } };
     window.setTheme = (t) => { document.body.className = t === 'twilight' ? '' : `theme-${t}`; localStorage.setItem('myAppTheme', t); };
     window.clearNotification = () => document.getElementById('note-badge').style.display='none';
-    window.deletePost = async (id) => { await deleteDoc(doc(db, "posts", id)); };
+    window.deletePost = async (id) => { if(confirm('投稿を削除しますか？')){ await deleteDoc(doc(db, "posts", id)); } };
 
     window.handleImageSelect = (input) => {
         const files = Array.from(input.files);
@@ -177,8 +183,8 @@
             div.innerHTML = `
                 <img src="${post.userPhoto || DEFAULT_AVATAR}" class="post-avatar">
                 <div style="flex:1; overflow:hidden;">
-                    <div class="post-info">
-                        <div><strong>${post.userName}</strong><span style="font-size:0.6rem; margin-left:8px; opacity:0.8;">${dateStr}</span></div>
+                    <div class="post-header">
+                        <div class="post-author-box"><strong>${post.userName}</strong><span class="post-time">${dateStr}</span></div>
                         <button class="delete-btn" onclick="deletePost('${post.id}')">×</button>
                     </div>
                     <div class="post-text">${post.content}</div>
@@ -200,7 +206,9 @@
             currentUserData.photo = localStorage.getItem('savedUserPhoto') || DEFAULT_AVATAR;
             document.getElementById('my-avatar').src = currentUserData.photo;
             document.getElementById('edit-name').value = currentUserData.name;
-            document.querySelectorAll('#app-section, #app-section-header, #theme-picker').forEach(el => el.style.display = 'block');
+            document.getElementById('app-section').style.display = 'block';
+            document.getElementById('app-section-header').style.display = 'block';
+            document.getElementById('theme-picker').style.display = 'flex';
             document.getElementById('login-section').style.display = 'none';
         }
     });
