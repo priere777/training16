@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MindStream</title>
     <style>
+        /* --- 基本スタイルはそのまま維持 --- */
         body { 
             font-family: 'Helvetica Neue', Arial, sans-serif; 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
@@ -48,7 +49,6 @@
         .dot-midnight { background: linear-gradient(135deg, #09203f, #537895); }
         .dot-forest { background: linear-gradient(135deg, #13547a, #80d0c7); }
 
-        /* 検索ボックス */
         .search-box { width: 92%; margin: 0 auto 15px; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.1); }
         .search-box input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 0.8rem; margin-left: 8px; }
 
@@ -63,7 +63,6 @@
         #post-btn { background: #ff7eb3; color: white; border: none; padding: 12px; border-radius: 30px; cursor: pointer; margin: 15px auto; font-size: 0.95rem; font-weight: bold; width: 92%; display: block; transition: background 0.3s; }
         #post-btn:disabled { opacity: 0.5; }
 
-        /* 投稿スタイル */
         .post-item { background: rgba(0, 0, 0, 0.2); padding: 15px; margin-bottom: 12px; border-radius: 18px; display: flex; gap: 12px; text-align: left; }
         .post-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
         .post-content-area { flex: 1; overflow: hidden; }
@@ -72,8 +71,8 @@
         .post-time { font-size: 0.65rem; margin-left: 8px; }
         .delete-btn { background: none; border: none; color: #ff6b6b; cursor: pointer; font-size: 1.1rem; opacity: 0.5; }
 
-        /* ハッシュタグのリンク色 */
-        .hashtag { color: #82ccdd; cursor: pointer; font-weight: bold; text-decoration: none; }
+        /* --- 修正：ハッシュタグの太さをノーマルに --- */
+        .hashtag { color: #82ccdd; cursor: pointer; font-weight: normal; text-decoration: none; }
         .hashtag:hover { text-decoration: underline; }
 
         .image-slider { display: flex; gap: 8px; overflow-x: auto; margin-top: 10px; scroll-snap-type: x mandatory; scrollbar-width: none; }
@@ -82,8 +81,7 @@
     </style>
 </head>
 <body>
-
-<div class="container">
+    <div class="container">
     <div id="ui-header" style="display:none;">
         <div class="top-actions">
             <div class="user-menu">
@@ -112,7 +110,6 @@
 
     <div id="app-section" style="display:none;">
         <div class="search-box">🔍<input type="text" id="tag-search" placeholder="タグやワードで検索..." oninput="renderPosts()"></div>
-
         <div class="input-group">
             <textarea id="post-input" maxlength="140" placeholder="今、何を考えてる？ #タグ もOK"></textarea>
             <div class="action-bar">
@@ -127,7 +124,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -155,14 +152,12 @@
     window.setTheme = (t) => { document.body.className = t === 'twilight' ? '' : `theme-${t}`; localStorage.setItem('myAppTheme', t); };
     window.deletePost = async (id) => { await deleteDoc(doc(db, "posts", id)); };
 
-    // 2. ハッシュタグ検索を実行する関数
     window.searchTag = (tag) => {
         const searchInput = document.getElementById('tag-search');
         searchInput.value = tag;
         renderPosts();
     };
 
-    // 3. テキスト内のハッシュタグをリンク化する関数
     const formatContent = (text) => {
         return text.replace(/[#＃]([A-Za-z0-9ぁ-ヶ亜-慶尊-梛]+)/g, (match, tag) => {
             return `<span class="hashtag" onclick="searchTag('${match}')">${match}</span>`;
