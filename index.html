@@ -26,15 +26,13 @@
             box-sizing: border-box; overflow: hidden; position: relative;
         }
 
-        /* --- 右上のアクションエリア --- */
         .top-actions { position: absolute; top: 15px; right: 20px; display: flex; align-items: center; gap: 15px; z-index: 100; }
         .notification-note { font-size: 1.2rem; cursor: pointer; opacity: 0.8; position: relative; }
         .note-badge { position: absolute; top: -2px; right: -5px; width: 8px; height: 8px; background: #fff; border-radius: 50%; display: none; box-shadow: 0 0 8px rgba(255,255,255,0.9); }
 
         .user-menu { position: relative; }
-        .my-avatar-mini { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid #fff; cursor: pointer; object-fit: cover; }
+        .my-avatar-mini { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid #fff; cursor: pointer; object-fit: cover; background: rgba(255,255,255,0.2); }
         
-        /* 設定パネル（ポップアップ） */
         .settings-panel { 
             position: absolute; top: 40px; right: 0; background: rgba(0,0,0,0.85); 
             padding: 15px; border-radius: 15px; display: none; width: 180px;
@@ -89,8 +87,10 @@
             box-sizing: border-box; transition: all 0.4s ease; 
         }
         .fade-out { opacity: 0; transform: scale(0.9) translateX(20px); pointer-events: none; }
-        .post-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
-        .post-text { font-size: 0.85rem; line-height: 1.5; color: #fff; word-break: break-all; margin-top: 4px; white-space: pre-wrap; }
+        .post-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; background: rgba(255,255,255,0.1); }
+        .post-info { display: flex; justify-content: space-between; font-size: 0.75rem; opacity: 0.6; margin-bottom: 4px; align-items: center; }
+        .post-time { font-size: 0.65rem; margin-left: 8px; opacity: 0.8; }
+        .post-text { font-size: 0.85rem; line-height: 1.5; color: #fff; word-break: break-all; white-space: pre-wrap; }
         .delete-btn { background: none; border: none; color: #ff6b6b; cursor: pointer; opacity: 0.3; font-size: 1rem; }
     </style>
 </head>
@@ -100,7 +100,7 @@
     <div id="app-section-header" style="display:none;">
         <div class="top-actions">
             <div class="user-menu">
-                <img id="my-avatar" class="my-avatar-mini" src="https://www.gravatar.com/avatar/0000?d=mp" onclick="toggleSettings()">
+                <img id="my-avatar" class="my-avatar-mini" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>" onclick="toggleSettings()">
                 <div id="settings-panel" class="settings-panel">
                     <h4>SETTINGS</h4>
                     <input type="text" id="edit-name" placeholder="名前を変更" onblur="updateProfileName()">
@@ -115,7 +115,6 @@
     </div>
 
     <h1>MindStream</h1>
-
     <div class="theme-picker" id="theme-picker" style="display:none;">
         <div class="theme-dot dot-twilight" onclick="setTheme('twilight')"></div>
         <div class="theme-dot dot-sunset" onclick="setTheme('sunset')"></div>
@@ -161,11 +160,12 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
+    const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
+
     let allPostsData = [];
     let isInitialLoad = true;
-    let currentUserData = { name: "Guest", photo: "" };
+    let currentUserData = { name: "Guest", photo: DEFAULT_AVATAR };
 
-    // --- 設定パネル制御 ---
     window.toggleSettings = () => {
         const panel = document.getElementById('settings-panel');
         panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
@@ -198,7 +198,6 @@
         if (!e.target.closest('.user-menu')) document.getElementById('settings-panel').style.display = 'none';
     });
 
-    // --- 基本機能 ---
     const postInput = document.getElementById('post-input');
     const charCounter = document.getElementById('char-counter');
     const postBtn = document.getElementById('post-btn');
@@ -231,13 +230,14 @@
         allPostsData.slice().reverse().forEach(post => {
             if (post.content.toLowerCase().includes(searchTerm) || post.userName.toLowerCase().includes(searchTerm)) {
                 const domId = `post-${post.id}`;
+                const dateStr = post.createdAt ? new Date(post.createdAt.seconds * 1000).toLocaleString('ja-JP', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
                 const div = document.createElement('div');
                 div.className = `post-item`; div.id = domId;
                 div.innerHTML = `
-                    <img src="${post.userPhoto || 'https://www.gravatar.com/avatar/0000?d=mp'}" class="post-avatar">
+                    <img src="${post.userPhoto || DEFAULT_AVATAR}" class="post-avatar">
                     <div style="flex:1;">
-                        <div style="display:flex; justify-content:space-between; font-size:0.75rem; opacity:0.6; margin-bottom:2px;">
-                            <strong>${post.userName}</strong>
+                        <div class="post-info">
+                            <div><strong>${post.userName}</strong><span class="post-time">${dateStr}</span></div>
                             <button class="delete-btn" onclick="deletePost('${post.id}', '${domId}')">×</button>
                         </div>
                         <div class="post-text">${post.content}</div>
@@ -261,7 +261,7 @@
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUserData.name = localStorage.getItem('savedUserName') || user.displayName;
-            currentUserData.photo = localStorage.getItem('savedUserPhoto') || user.photoURL;
+            currentUserData.photo = localStorage.getItem('savedUserPhoto') || DEFAULT_AVATAR;
             document.getElementById('my-avatar').src = currentUserData.photo;
             document.getElementById('edit-name').value = currentUserData.name;
             document.getElementById('login-section').style.display = 'none';
