@@ -13,7 +13,6 @@
             transition: background 0.8s ease;
         }
         
-        /* 背景テーマ（改良版） */
         body.theme-sunset { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
         body.theme-midnight { background: linear-gradient(135deg, #09203f 0%, #537895 100%); }
         body.theme-forest { background: linear-gradient(135deg, #13547a 0%, #80d0c7 100%); }
@@ -27,8 +26,9 @@
             box-sizing: border-box; overflow: hidden; position: relative;
         }
 
-        .notification-bell { position: absolute; top: 20px; right: 20px; font-size: 1.2rem; cursor: pointer; }
-        .bell-badge { position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #ff4b2b; border-radius: 50%; display: none; }
+        /* 通知：ベルから音符へ変更 */
+        .notification-note { position: absolute; top: 20px; right: 25px; font-size: 1.2rem; cursor: pointer; opacity: 0.8; }
+        .note-badge { position: absolute; top: -2px; right: -5px; width: 8px; height: 8px; background: #fff; border-radius: 50%; display: none; box-shadow: 0 0 5px rgba(255,255,255,0.8); }
 
         .theme-picker { display: flex; justify-content: center; gap: 12px; margin-bottom: 15px; }
         .theme-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; transition: transform 0.2s; }
@@ -48,23 +48,24 @@
         .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; }
         #user-name-input { width: 80px; padding: 5px; border-radius: 8px; border: none; text-align: center; font-size: 16px; font-weight: bold; }
         
-        .input-group { background: rgba(255, 255, 255, 0.9); border-radius: 15px; padding: 10px; text-align: left; box-sizing: border-box; }
+        /* 入力エリアと文字数カウント */
+        .input-group { background: rgba(255, 255, 255, 0.9); border-radius: 15px; padding: 10px; text-align: left; box-sizing: border-box; position: relative; }
         textarea { width: 100%; height: 50px; background: transparent; border: none; font-size: 16px; color: #333; outline: none; resize: none; display: block; }
+        .char-count { position: absolute; bottom: 45px; right: 15px; font-size: 0.65rem; color: #bbb; pointer-events: none; }
         
         .action-bar { display: flex; align-items: center; gap: 10px; border-top: 1px solid #eee; padding-top: 5px; margin-top: 5px; }
         .add-img-btn { color: #764ba2; font-size: 1rem; cursor: pointer; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border: 1px dashed #764ba2; border-radius: 5px; background: #fff; }
         #image-preview { max-width: 35px; max-height: 35px; border-radius: 4px; display: none; object-fit: cover; }
 
-        /* --- ボタンの色調整（より馴染む「いい色」へ） --- */
         #post-btn { 
-            background: #ff7eb3; /* Twilight: 華やかなピンク */
-            color: white; border: none; padding: 10px; border-radius: 30px; 
+            background: #ff7eb3; color: white; border: none; padding: 10px; border-radius: 30px; 
             cursor: pointer; margin: 12px auto; font-size: 0.95rem; font-weight: bold; 
             width: 92%; display: block; transition: all 0.5s ease; 
         }
-        body.theme-sunset #post-btn { background: #ff7f50; }  /* Sunset: 温かいコーラル */
-        body.theme-midnight #post-btn { background: #4a69bd; } /* Midnight: 落ち着いたブルー */
-        body.theme-forest #post-btn { background: #2d9687; }  /* Forest: 透明感のあるティール */
+        #post-btn:disabled { background: #ccc !important; cursor: not-allowed; opacity: 0.6; }
+        body.theme-sunset #post-btn { background: #ff7f50; }
+        body.theme-midnight #post-btn { background: #4a69bd; }
+        body.theme-forest #post-btn { background: #2d9687; }
 
         .post-item { 
             background: rgba(0, 0, 0, 0.2); padding: 12px 15px; margin-bottom: 12px; 
@@ -89,8 +90,8 @@
 <body>
 
 <div class="container">
-    <div class="notification-bell" id="bell-icon" onclick="clearNotification()">
-        🔔<div class="bell-badge" id="bell-badge"></div>
+    <div class="notification-note" id="note-icon" onclick="clearNotification()">
+        ♪<div class="note-badge" id="note-badge"></div>
     </div>
     <div class="theme-picker" id="theme-picker" style="display:none;">
         <div class="theme-dot dot-twilight" onclick="setTheme('twilight')"></div>
@@ -108,13 +109,14 @@
             <button id="logout-btn" style="background:none; border:none; color:white; font-size:0.6rem; opacity:0.6;">退出</button>
         </div>
         <div class="input-group">
-            <textarea id="post-input" placeholder="今、何を考えてる？"></textarea>
+            <textarea id="post-input" maxlength="140" placeholder="今、何を考えてる？"></textarea>
+            <div id="char-counter" class="char-count">140</div>
             <div class="action-bar">
                 <label class="add-img-btn">＋<input type="file" id="image-input" accept="image/*" style="display:none;"></label>
                 <img id="image-preview">
             </div>
         </div>
-        <button id="post-btn">つぶやく</button>
+        <button id="post-btn" disabled>つぶやく</button>
         <div id="posts-list"></div>
     </div>
 </div>
@@ -141,6 +143,19 @@
     let allPostsData = [];
     let isInitialLoad = true;
 
+    // --- 文字数カウントとボタン制御 ---
+    const postInput = document.getElementById('post-input');
+    const charCounter = document.getElementById('char-counter');
+    const postBtn = document.getElementById('post-btn');
+
+    postInput.addEventListener('input', () => {
+        const length = postInput.value.length;
+        const remaining = 140 - length;
+        charCounter.textContent = remaining;
+        charCounter.style.color = remaining < 20 ? "#ff4b2b" : "#bbb";
+        postBtn.disabled = length === 0 || remaining < 0;
+    });
+
     window.setTheme = (theme) => {
         document.body.className = theme === 'twilight' ? '' : `theme-${theme}`;
         localStorage.setItem('myAppTheme', theme);
@@ -148,7 +163,7 @@
     const savedTheme = localStorage.getItem('myAppTheme');
     if (savedTheme) setTheme(savedTheme);
 
-    window.clearNotification = () => { document.getElementById('bell-badge').style.display = 'none'; };
+    window.clearNotification = () => { document.getElementById('note-badge').style.display = 'none'; };
 
     window.deletePost = async (id, domId) => {
         const el = document.getElementById(domId);
@@ -209,7 +224,7 @@
         const newPosts = [];
         snapshot.forEach(doc => newPosts.push({id: doc.id, ...doc.data()}));
         if (!isInitialLoad && newPosts.length > allPostsData.length) {
-            document.getElementById('bell-badge').style.display = 'block';
+            document.getElementById('note-badge').style.display = 'block';
         }
         allPostsData = newPosts;
         renderAll();
@@ -233,6 +248,8 @@
             content: textEl.value, userName: document.getElementById('user-name-input').value, likes: 0, replyTo: null, createdAt: serverTimestamp()
         });
         textEl.value = "";
+        charCounter.textContent = "140";
+        postBtn.disabled = true;
     };
     document.getElementById('logout-btn').onclick = () => signOut(auth);
 
